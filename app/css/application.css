@@ -68,3 +68,6 @@ h1 {
 
 .x {color: hsla( 208, 55.9%, 44.5%, 1); }
 .o {color: hsla( 120, 39.6%, 46.0%, 1); }
+
+.win   {color: hsla( 2, 55.9%, 50.0%, 1); } /*red*/
+.unwin {color: hsla( 0,  0.0%, 80.0%, 1); } /*light grey*/
