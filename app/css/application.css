@@ -5,7 +5,7 @@
 * hsla( 0, 0.0%, 100.0% ,1);    White
 * hsla(   2, 64.7%, 50.0%, 1 ); Red
 * hsla( 208, 55.9%, 44.5%, 1 ); Blue
-* 
+* hsla( 0,  0.0%, 80.0%, 1);    Light Grey
 */
 
 
@@ -69,5 +69,5 @@ h1 {
 .x {color: hsla( 208, 55.9%, 44.5%, 1); }
 .o {color: hsla( 120, 39.6%, 46.0%, 1); }
 
-.win   {color: hsla( 2, 55.9%, 50.0%, 1); } /*red*/
-.unwin {color: hsla( 0,  0.0%, 80.0%, 1); } /*light grey*/
+.win   {color: hsla( 2, 55.9%, 50.0%, 1); } 
+.unwin {color: hsla( 0,  0.0%, 80.0%, 1); } 
