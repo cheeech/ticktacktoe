@@ -1,3 +1,14 @@
+/*
+* hsla( 208, 55.9%, 44.5%, 1);  Blue
+* hsla( 120, 39.6%, 46.0%, 1);  Green
+* hsla( 0, 0.0%, 13.3%, 1);     Black / Dark Grey?
+* hsla( 0, 0.0%, 100.0% ,1);    White
+* hsla(   2, 64.7%, 50.0%, 1 ); Red
+* hsla( 208, 55.9%, 44.5%, 1 ); Blue
+* 
+*/
+
+
 html,
 body {
 	font-family: verdana, helvetica, arial, sans-sarif;
@@ -55,3 +66,5 @@ h1 {
 .left   {border-left:   0;}
 .right  {border-right:  0;}
 
+.x {color: hsla( 208, 55.9%, 44.5%, 1); }
+.o {color: hsla( 120, 39.6%, 46.0%, 1); }
