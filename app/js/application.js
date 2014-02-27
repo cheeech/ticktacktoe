@@ -26,6 +26,16 @@
       this.getPatterns = __bind(this.getPatterns, this);
       this.resetBoard();
       this.$scope.mark = this.mark;
+      this.$scope.startGame = this.startGame;
+      this.$scope.gameon = false;
+      ({
+        startGame: (function(_this) {
+          return function() {
+            _this.$scope.gameOn = true;
+            return resetBoard();
+          };
+        })(this)
+      });
     }
 
     BoardCtrl.prototype.getPatterns = function() {
@@ -115,12 +125,12 @@
         whoMovedLast: true
       });
       alert("" + winner + " wins!");
-      return this.resetBoard();
+      return this.$scope.gameOn = false;
     };
 
     BoardCtrl.prototype.announceTie = function() {
       alert("It's a tie!");
-      return this.resetBoard();
+      return this.$scope.gameOn = false;
     };
 
     BoardCtrl.prototype.rowStillWinnable = function(row) {

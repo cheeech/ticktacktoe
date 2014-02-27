@@ -18,6 +18,13 @@ class BoardCtrl
   constructor: (@$scope, @WIN_PATTERNS) ->
     @resetBoard()
     @$scope.mark = @mark
+    @$scope.startGame = @startGame
+    @$scope.gameon = false
+
+    startGame: =>
+      @$scope.gameOn= true
+      resetBoard()
+
 
   getPatterns: =>
     @patternsToTest = @WIN_PATTERNS.filter -> true
@@ -78,11 +85,11 @@ class BoardCtrl
   announceWinner: =>
     winner = @player(whoMovedLast: true)
     alert "#{winner} wins!"
-    @resetBoard()
+    @$scope.gameOn = false
 
   announceTie: =>
     alert "It's a tie!"
-    @resetBoard()
+    @$scope.gameOn = false
 
   rowStillWinnable: (row) =>
     not (@isMixedRow(row) or
