@@ -19,12 +19,11 @@ class BoardCtrl
     @resetBoard()
     @$scope.mark = @mark
     @$scope.startGame = @startGame
-    @$scope.gameon = false
+    @$scope.gameOn = false
 
-    startGame: =>
-      @$scope.gameOn= true
-      resetBoard()
-
+  startGame: =>
+    @$scope.gameOn = true
+    @resetBoard()
 
   getPatterns: =>
     @patternsToTest = @WIN_PATTERNS.filter -> true
@@ -40,7 +39,11 @@ class BoardCtrl
     'xxx' == row || 'ooo' == row
 
   resetBoard: =>
+    @$scope.theWinnerIs = false
+    @$scope.cats = false
     @cells = @$scope.cells = {}
+    @winningCells = @$scope.winningCells = {}
+    @$scope.currentPlayer = @player()
     @getPatterns()
 
   numberOfMoves: =>
@@ -62,7 +65,7 @@ class BoardCtrl
     if moves % 2 == 0 then 'x' else 'o'
 
   isMixedRow: (row) ->
-    !!row.match(/ox\d|o\dx|\dox|xo\d|x\do|\dxo/i)
+    !!row.match(/o+\d?x+|x+\d?o+/i)
 
   hasOneX: (row) ->
     !!row.match(/x\d\d|\dx\d|\d\dx/i)
@@ -82,13 +85,15 @@ class BoardCtrl
   gameUnwinnable: =>
     @patternsToTest.length < 1
 
-  announceWinner: =>
-    winner = @player(whoMovedLast: true)
-    alert "#{winner} wins!"
+  announceWinner: (winningPattern) =>
+    winner = @cells[winningPattern[0]]
+    for k, v of @cells
+      @winningCells[k] = if parseInt(k) in winningPattern then 'win' else 'unwin'
+    @$scope.theWinnerIs = winner
     @$scope.gameOn = false
 
   announceTie: =>
-    alert "It's a tie!"
+    @$scope.cats = true
     @$scope.gameOn = false
 
   rowStillWinnable: (row) =>
@@ -100,22 +105,24 @@ class BoardCtrl
     (@isEmptyRow(row) and @movesRemaining() < 5))
 
   parseBoard: =>
-    won = false
+    winningPattern = false
 
     @patternsToTest = @patternsToTest.filter (pattern) =>
       row = @getRow(pattern)
-      won ||= @someoneWon(row)
+      winningPattern ||= pattern if @someoneWon(row)
       @rowStillWinnable(row)
 
-    if won
-      @announceWinner()
+    if winningPattern
+      @announceWinner(winningPattern)
     else if @gameUnwinnable()
       @announceTie()
 
   mark: (@$event) =>
     cell = @$event.target.dataset.index
-    @cells[cell] = @player()
-    @parseBoard()
+    if @$scope.gameOn && !@cells[cell]
+      @cells[cell] = @player()
+      @parseBoard()
+      @$scope.currentPlayer = @player()
 
 
 BoardCtrl.$inject = ["$scope", "WIN_PATTERNS"]
