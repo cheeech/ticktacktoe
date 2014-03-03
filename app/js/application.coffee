@@ -1,6 +1,6 @@
 "use strict"
 
-@ticTacToe = angular.module 'TicTacToe', ['firebase']
+@ticTacToe = angular.module 'TicTacToe', ["firebase"]
 
 ticTacToe.constant 'WIN_PATTERNS',
   [
@@ -21,14 +21,14 @@ class BoardCtrl
     @$scope.startGame = @startGame
     @$scope.gameOn = false
 
-    @dbRef = new Firebase "https://tictactoe-chenghtmark.firebaseio.com/"
-    @db = @$firebase @dbRef
+  uniqueId: (length = 8) ->
+    id = ""
+    id += Math.random().toString(36).substr(2) while id.length < length
+    id.substr 0, length
 
   startGame: =>
-    @db.$add "hi"
     @$scope.gameOn = true
     @resetBoard()
-
 
   getPatterns: =>
     @patternsToTest = @WIN_PATTERNS.filter -> true
@@ -48,6 +48,13 @@ class BoardCtrl
     @$scope.cats = false
     @cells = @$scope.cells = {}
     @winningCells = @$scope.winningCells = {}
+
+    @unbind() if @unbind
+    @id = @uniqueId()
+    @dbRef = new Firebase "https://tictactoe-chenghtmark.firebaseio.com/#{@id}"
+    @db = @$firebase @dbRef
+    @db.$bind( @$scope, 'cells' ).then (unbind) => @unbind = unbind
+
     @$scope.currentPlayer = @player()
     @getPatterns()
 

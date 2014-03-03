@@ -5,7 +5,7 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  this.ticTacToe = angular.module('TicTacToe', ['firebase']);
+  this.ticTacToe = angular.module('TicTacToe', ["firebase"]);
 
   ticTacToe.constant('WIN_PATTERNS', [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]);
 
@@ -31,12 +31,21 @@
       this.$scope.mark = this.mark;
       this.$scope.startGame = this.startGame;
       this.$scope.gameOn = false;
-      this.dbRef = new Firebase("https://tictactoe-chenghtmark.firebaseio.com/");
-      this.db = this.$firebase(this.dbRef);
     }
 
+    BoardCtrl.prototype.uniqueId = function(length) {
+      var id;
+      if (length == null) {
+        length = 8;
+      }
+      id = "";
+      while (id.length < length) {
+        id += Math.random().toString(36).substr(2);
+      }
+      return id.substr(0, length);
+    };
+
     BoardCtrl.prototype.startGame = function() {
-      this.db.$add("hi");
       this.$scope.gameOn = true;
       return this.resetBoard();
     };
@@ -65,6 +74,17 @@
       this.$scope.cats = false;
       this.cells = this.$scope.cells = {};
       this.winningCells = this.$scope.winningCells = {};
+      if (this.unbind) {
+        this.unbind();
+      }
+      this.id = this.uniqueId();
+      this.dbRef = new Firebase("https://tictactoe-chenghtmark.firebaseio.com/" + this.id);
+      this.db = this.$firebase(this.dbRef);
+      this.db.$bind(this.$scope, 'cells').then((function(_this) {
+        return function(unbind) {
+          return _this.unbind = unbind;
+        };
+      })(this));
       this.$scope.currentPlayer = this.player();
       return this.getPatterns();
     };
