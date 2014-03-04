@@ -51,9 +51,16 @@
         this.unbind();
       }
       this.id = this.uniqueId();
-      this.dbRef = new Firebase("https://tictactoe-chenghtmark.firebaseio.com/" + this.id);
-      this.db = this.$firebase(this.dbRef);
-      return this.db.$bind(this.$scope, 'cells').then((function(_this) {
+      this.dbRef = new Firebase("https://tictactoe-chenghtmark.firebaseio.com/" + this.id + "/");
+      this.db = this.$firebase(this.dbRef.child('board'));
+      this.dc = this.$firebase(this.dbRef.child('player'));
+      this.db.$bind(this.$scope, 'cells').then((function(_this) {
+        return function(unbind) {
+          _this.unbind = unbind;
+          return _this.$scope.gameOn = true;
+        };
+      })(this));
+      return this.dc.$bind(this.$scope, 'currentPlayer').then((function(_this) {
         return function(unbind) {
           _this.unbind = unbind;
           return _this.$scope.gameOn = true;
