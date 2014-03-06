@@ -31,6 +31,8 @@
       this.$scope.mark = this.mark;
       this.$scope.startGame = this.startGame;
       this.$scope.gameOn = false;
+      this.queueRef = new Firebase("https://tictactoe-chenghtmark.firebaseio.com/Queue");
+      this.gamesRef = new Firebase("https://tictactoe-chenghtmark.firebaseio.com/Games");
     }
 
     BoardCtrl.prototype.uniqueId = function(length) {
@@ -47,23 +49,46 @@
 
     BoardCtrl.prototype.startGame = function() {
       this.resetBoard();
-      if (this.unbind) {
-        this.unbind();
+      if (this.unbindPlayer) {
+        this.unbindPlayer();
+      }
+      if (this.unbindBoard) {
+        this.unbindBoard();
       }
       this.id = this.uniqueId();
-      this.dbRef = new Firebase("https://tictactoe-chenghtmark.firebaseio.com/" + this.id + "/");
-      this.db = this.$firebase(this.dbRef.child('board'));
-      this.dc = this.$firebase(this.dbRef.child('player'));
-      this.db.$bind(this.$scope, 'cells').then((function(_this) {
+      this.queueRef.transaction((function(_this) {
+        return function(currentValue) {
+          var gameID;
+          if (currentValue === null) {
+            return _this.id;
+          } else {
+            gameID = currentValue;
+            return currentValue = null;
+          }
+        };
+      })(this), (function(_this) {
+        return function(error, commit, snapshot) {
+          if (error) {
+            console.log("Transaction Failed " + error);
+          } else if (!commit) {
+            console.log("Can not execute because " + _this.player + " already exists");
+          } else {
+            console.log("" + _this.player + " added");
+          }
+          return console.log("" + _this.player + " ", snapshot.val());
+        };
+      })(this));
+      this.dbBoard = this.$firebase(this.gamesRef.child(this.id));
+      this.dbBoard.$bind(this.$scope, 'cells').then((function(_this) {
         return function(unbind) {
-          _this.unbind = unbind;
+          _this.unbindBoard = unbind;
           return _this.$scope.gameOn = true;
         };
       })(this));
-      return this.dc.$bind(this.$scope, 'currentPlayer').then((function(_this) {
+      this.dbPlayer = this.$firebase(this.gamesRef.child('player'));
+      return this.dbPlayer.$bind(this.$scope, 'currentPlayer').then((function(_this) {
         return function(unbind) {
-          _this.unbind = unbind;
-          return _this.$scope.gameOn = true;
+          return _this.unbindPlayer = unbind;
         };
       })(this));
     };

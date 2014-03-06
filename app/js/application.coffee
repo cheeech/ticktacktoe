@@ -20,6 +20,9 @@ class BoardCtrl
     @$scope.mark = @mark
     @$scope.startGame = @startGame
     @$scope.gameOn = false
+    @queueRef = new Firebase "https://tictactoe-chenghtmark.firebaseio.com/Queue"
+    @gamesRef = new Firebase "https://tictactoe-chenghtmark.firebaseio.com/Games"
+
 
   uniqueId: (length = 8) ->
     id = ""
@@ -28,19 +31,45 @@ class BoardCtrl
 
   startGame: =>
     @resetBoard()
-    @unbind() if @unbind
+    @unbindPlayer() if @unbindPlayer
+    @unbindBoard() if @unbindBoard
     @id = @uniqueId()
-    @dbRef = new Firebase "https://tictactoe-chenghtmark.firebaseio.com/#{@id}/"
-    @db = @$firebase @dbRef.child('board')
-    @dc = @$firebase @dbRef.child('player')
 
-    @db.$bind( @$scope, 'cells' ).then (unbind) =>
-      @unbind = unbind
+
+    @queueRef.transaction (currentValue) =>
+      if currentValue == null
+        @id
+
+      else
+        gameID = currentValue
+        currentValue = null
+
+    ,(error, commit, snapshot) =>
+
+      if error then console.log "Transaction Failed #{error}"
+
+      else if !commit
+
+        console.log "Can not execute because #{@player} already exists"
+
+      else
+        console.log "#{@player} added"
+
+      console.log "#{@player} ", snapshot.val()
+
+
+    @dbBoard = @$firebase @gamesRef.child(@id)
+    @dbBoard.$bind( @$scope, 'cells' ).then (unbind) =>
+      @unbindBoard = unbind
       @$scope.gameOn = true
 
-    @dc.$bind( @$scope, 'currentPlayer' ).then (unbind) =>
-      @unbind = unbind
-      @$scope.gameOn = true
+    @dbPlayer = @$firebase @gamesRef.child('player')
+    @dbPlayer.$bind( @$scope, 'currentPlayer' ).then (unbind) =>
+      @unbindPlayer = unbind
+
+
+
+
 
   getPatterns: =>
     @patternsToTest = @WIN_PATTERNS.filter -> true
